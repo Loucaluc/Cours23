@@ -11,6 +11,9 @@ public class GameController : MonoBehaviour {
     public int attack;
     public int defense;
     public int health;
+    public int currentWeapon;
+
+    public List<Weapon> listWeapon = new List<Weapon>();
 
 	// Use this for initialization
 	void Start () {
@@ -44,7 +47,39 @@ public class GameController : MonoBehaviour {
         attack = playerDataToLoad.attack;
         defense = playerDataToLoad.defense;
         health = playerDataToLoad.health;
+        listWeapon = playerDataToLoad.listWeapon;
+        currentWeapon = playerDataToLoad.currenWeapon;
     }
+
+    public void AddWeapon()
+    {
+        listWeapon.Add(new Weapon());
+    }
+
+    public void NextWeapon()
+    {
+        if (currentWeapon == listWeapon.Count - 1)
+        {
+            currentWeapon = 0;
+        }
+        else
+        {
+            currentWeapon++;
+        }
+    }
+
+    public void PreviousWeapon()
+    {
+        if (currentWeapon == 0)
+        {
+            currentWeapon = listWeapon.Count - 1;
+        }
+        else
+        {
+            currentWeapon--;
+        }
+    }
+
 
     public void AddAttack()
     {
@@ -61,11 +96,18 @@ public class GameController : MonoBehaviour {
         health++;
     }
 
+    public void AddDamageToWeapon()
+    {
+        listWeapon[currentWeapon].damage += 1;
+    }
+
     public void SetDefaultValue()
     {
         attack = 1;
         defense = 1;
         health = 1;
+        currentWeapon = 0;
+        listWeapon = new List<Weapon>();
     }
 
     public void Save()
@@ -73,10 +115,13 @@ public class GameController : MonoBehaviour {
         BinaryFormatter bf = new BinaryFormatter();
         FileStream file = File.Open(Application.persistentDataPath + "gameInfo.dat",FileMode.Create);
         PlayerData playerDataToSave = new PlayerData();
+    
 
         playerDataToSave.attack = attack;
         playerDataToSave.defense = defense;
         playerDataToSave.health = health;
+        playerDataToSave.currenWeapon = currentWeapon;
+        playerDataToSave.listWeapon = listWeapon;
 
         bf.Serialize(file, playerDataToSave);
         file.Close();
@@ -86,10 +131,15 @@ public class GameController : MonoBehaviour {
     {
         GUIStyle style = new GUIStyle();
         style.fontSize = 32;
-        GUI.Label(new Rect(10, 60, 180, 80),"Attaque : " + attack,style);
-        GUI.Label(new Rect(10, 110, 180, 80),"Défense : " + defense,style);
-        GUI.Label(new Rect(10, 160, 180, 80),"Vie : " + health,style);
+        GUI.Label(new Rect(10, 80,180, 80),"Attaque : " + attack,style);
+        GUI.Label(new Rect(10, 130, 180, 80),"Défense : " + defense,style);
+        GUI.Label(new Rect(10, 180, 180, 80),"Vie : " + health,style);
+        GUI.Label(new Rect(10, 230, 180, 80), "#Arme : " + currentWeapon, style);
 
+        if (listWeapon.Count > 0)
+        {
+            GUI.Label(new Rect(10, 280, 180, 80), "Arme Damage : " + listWeapon[currentWeapon].damage, style);
+        }
     }
 }
 
@@ -99,4 +149,20 @@ class PlayerData
     public int attack;
     public int defense;
     public int health;
+    public int currenWeapon;
+    public List<Weapon> listWeapon;
 }
+
+[Serializable]
+public class Weapon
+{
+    public int damage; 
+
+    public Weapon()
+    {
+        damage = 1;
+    }
+}
+
+
+
